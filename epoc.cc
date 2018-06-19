@@ -1,8 +1,7 @@
-#include <nan.h>
 #include "epoc_utils.hpp"
-#include <node.h>
 
-void ConnectToLiveData(const Nan::FunctionCallbackInfo<Value>& info){
+
+Napi::Value ConnectToLiveData(const Napi::CallbackInfo& info){
   // Throw an error if the path to the profile file is not provided.
   if(info.Length() < 2){
     return Nan::ThrowSyntaxError("wrong number of arguments");
@@ -36,7 +35,7 @@ void ConnectToLiveData(const Nan::FunctionCallbackInfo<Value>& info){
   }
 }
 
-void ConnectToEmoComposer(const Nan::FunctionCallbackInfo<Value>& info){
+Napi::Value ConnectToEmoComposer(const Napi::CallbackInfo& info){
   if(info.Length() > 1){
     return Nan::ThrowSyntaxError("wrong number of arguments");
   }
@@ -255,12 +254,12 @@ void epocutils::showCurrentActionPower(EmoStateHandle eState)
 	}
 }
 
-void Init(Local<Object> exports){
-  exports->Set(Nan::New("connectToLiveData").ToLocalChecked(),
-               Nan::New<FunctionTemplate>(ConnectToLiveData)->GetFunction());
-
-  exports->Set(Nan::New("connectToEmoComposer").ToLocalChecked(),
-               Nan::New<FunctionTemplate>(ConnectToEmoComposer)->GetFunction());
+Napi::Object Init(Napi::Env env, Napi::Object exports){
+  exports.Set(Napi::String::New(env, "connectToLiveData"),
+    Napi::Function::New(env, ConnectToLiveData));
+  exports.Set(Napi::String::New(env, "connectToEmoComposer"), 
+    Napi::Function::New(env, ConnectToEmoComposer));
+  return exports;             
 }
 
-NODE_MODULE(index, Init);
+NODE_API_MODULE(NODE_GYP_MODULE_NAME, Init);

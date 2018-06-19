@@ -1,6 +1,6 @@
 #include <iostream>
 #include <map>
-#include <v8.h>
+#include <napi.h>
 
 /* include the Emotiv files from the SDK */
 #include "IEmoStateDLL.h"
@@ -11,7 +11,6 @@
 #include "FacialExpressionDetection.h"
 #include "lib/includes/IEmotivProfile.h"
 
-using namespace v8;
 using namespace std;
 
 #ifndef epocutils_h
@@ -67,13 +66,13 @@ namespace epocutils{
 
     EpocHeadset_t user;
 
-    void handleEpocEvents(int dataOption, int& connectionState, EmoEngineEventHandle eEvent, EmoStateHandle eState, int& epocState, unsigned int userID, EpocHeadset_t user, Local<Function> callbackHandle, Local<Object> event);
+    void handleEpocEvents(int dataOption, int& connectionState, EmoEngineEventHandle eEvent, EmoStateHandle eState, int& epocState, unsigned int userID, EpocHeadset_t user, Napi::Function callbackHandle, Napi::Object event);
     void handleFacialExpressionsEvents(EmoStateHandle eState, Local<Object> event, EpocHeadset_t user);
     void sendFacialExpressionsEventsToJs(Local<Object> event, EpocHeadset_t user);
     void handleMentalCommandsEvent(Local<Object> event, EpocHeadset_t user, EmoStateHandle eState, EmoEngineEventHandle eEvent);
     void showCurrentActionPower(EmoStateHandle eState);
 
-    void checkEventType(IEE_Event_t eventType, EmoEngineEventHandle eEvent, EmoStateHandle eState, Local<Object> event);
+    void checkEventType(IEE_Event_t eventType, EmoEngineEventHandle eEvent, EmoStateHandle eState, Napi::Object event);
 
 };
 
