@@ -9,14 +9,12 @@ Napi::Value ConnectToLiveData(const Napi::CallbackInfo& info){
   //The callback function should be the 2nd argument passed.
   Napi::Function callbackHandle =  info[1].As<Napi::Function>();
 
-  v8::String::Utf8Value param1(info[0]->ToString());
-
-  epocutils::pathToProfileFile = string(*param1);
+  epocutils::pathToProfileFile = info[0].As<Napi::String>().Utf8Value();
 
   epocutils::dataOption = 1;
   epocutils::connectionState = epocutils::getConnectionState(epocutils::dataOption);
 
-  Local<Object> event = Nan::New<Object>();
+  Napi::Object event = Napi::Object::New(env);
 
   int chargeLevel = 0, maxChargeLevel = 0, batteryLevel = 0, previousBatteryLevel = 0;
 
@@ -28,7 +26,7 @@ Napi::Value ConnectToLiveData(const Napi::CallbackInfo& info){
       batteryLevel = chargeLevel * 100 / maxChargeLevel;
 
       if(batteryLevel != previousBatteryLevel){
-        Nan::Set(event, Nan::New("batteryLevel").ToLocalChecked(), Nan::New(batteryLevel));
+        event.Set("batteryLevel", batteryLevel);
       }
       // Handle facial expressions and mental commands
       epocutils::handleEpocEvents(epocutils::dataOption, epocutils::connectionState, epocutils::eEvent, epocutils::eState, epocutils::epocState, epocutils::userID, epocutils::user, callbackHandle, event);
