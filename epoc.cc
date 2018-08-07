@@ -1,15 +1,16 @@
 #include "epoc_utils.hpp"
 
-
 Napi::Value ConnectToLiveData(const Napi::CallbackInfo& info){
+  Napi::Env env = info.Env();
   // Throw an error if the path to the profile file is not provided.
   if(info.Length() < 2){
-    return Nan::ThrowSyntaxError("wrong number of arguments");
+    throw  Napi::TypeError::New(env, "wrong number of arguments");
   }
   //The callback function should be the 2nd argument passed.
-  Local<Function> callbackHandle = info[1].As<Function>();
+  Napi::Function callbackHandle =  info[1].As<Napi::Function>();
 
   v8::String::Utf8Value param1(info[0]->ToString());
+
   epocutils::pathToProfileFile = string(*param1);
 
   epocutils::dataOption = 1;
@@ -36,16 +37,17 @@ Napi::Value ConnectToLiveData(const Napi::CallbackInfo& info){
 }
 
 Napi::Value ConnectToEmoComposer(const Napi::CallbackInfo& info){
+  Napi::Env env = info.Env();
   if(info.Length() > 1){
-    return Nan::ThrowSyntaxError("wrong number of arguments");
+    throw Napi::TypeError::New(env, "wrong number of arguments");
   }
 
-  Local<Function> callbackHandle = info[0].As<Function>();
+  Napi::Function callbackHandle = info[0].As<Napi::Function>();
 
   epocutils::dataOption = 2;
   epocutils::connectionState = epocutils::getConnectionState(epocutils::dataOption);
 
-  Local<Object> event = Nan::New<Object>();
+  Napi::Object event = Napi::Object::New(env);
 
   if(epocutils::connectionState != -1){
     while(true){
