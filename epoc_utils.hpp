@@ -30,8 +30,8 @@ namespace epocutils{
     string pathToProfileFile;
 
     int getConnectionState(int optionChosen);
-    void getGyroData(Local<Object> event, unsigned int userID);
-    void sendGyroDataToJs(Local<Object> event, int xPos, int yPos);
+    void getGyroData(Napi::Object event, unsigned int userID);
+    void sendGyroDataToJs(Napi::Object event, int xPos, int yPos);
     void loadProfile(unsigned int userID);
     void showTrainedActions(unsigned int userID);
 
@@ -67,9 +67,9 @@ namespace epocutils{
     EpocHeadset_t user;
 
     void handleEpocEvents(int dataOption, int& connectionState, EmoEngineEventHandle eEvent, EmoStateHandle eState, int& epocState, unsigned int userID, EpocHeadset_t user, Napi::Function callbackHandle, Napi::Object event);
-    void handleFacialExpressionsEvents(EmoStateHandle eState, Local<Object> event, EpocHeadset_t user);
-    void sendFacialExpressionsEventsToJs(Local<Object> event, EpocHeadset_t user);
-    void handleMentalCommandsEvent(Local<Object> event, EpocHeadset_t user, EmoStateHandle eState, EmoEngineEventHandle eEvent);
+    void handleFacialExpressionsEvents(EmoStateHandle eState, Napi::Object event, EpocHeadset_t user);
+    void sendFacialExpressionsEventsToJs(Napi::Object event, EpocHeadset_t user);
+    void handleMentalCommandsEvent(Napi::Object event, EpocHeadset_t user, EmoStateHandle eState, EmoEngineEventHandle eEvent);
     void showCurrentActionPower(EmoStateHandle eState);
 
     void checkEventType(IEE_Event_t eventType, EmoEngineEventHandle eEvent, EmoStateHandle eState, Napi::Object event);
