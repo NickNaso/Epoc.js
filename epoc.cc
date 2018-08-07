@@ -83,7 +83,7 @@ int epocutils::getConnectionState(int optionChosen){
   return -1;
 }
 
-void epocutils::handleEpocEvents(int dataOption, int& connectionState, EmoEngineEventHandle eEvent, EmoStateHandle eState, int& epocState, unsigned int userID, epocutils::EpocHeadset_t user, Local<Function> callbackHandle, Local<Object> event){
+void epocutils::handleEpocEvents(int dataOption, int& connectionState, EmoEngineEventHandle eEvent, EmoStateHandle eState, int& epocState, unsigned int userID, epocutils::EpocHeadset_t user, Napi::Function callbackHandle, Napi::Object event){
 
   if(connectionState == 0){
     epocState = IEE_EngineGetNextEvent(eEvent);
@@ -114,10 +114,7 @@ void epocutils::handleEpocEvents(int dataOption, int& connectionState, EmoEngine
         // epocutils::showCurrentActionPower(eState);
       }
 
-      Local<Value> parameters[1];
-      parameters[0] = event;
-
-      Nan::MakeCallback(Nan::GetCurrentContext()->Global(), callbackHandle, 1, parameters);
+      callbackHandle.Call({event});
     }
   }
 }
@@ -144,7 +141,7 @@ void epocutils::showTrainedActions(unsigned int userID){
   // }
 }
 
-void epocutils::getGyroData(Local<Object> event, unsigned int userID){
+void epocutils::getGyroData(Napi::Object event, unsigned int userID){
   IEE_HeadsetGetGyroDelta(userID, &gyroX, &gyroY);
 
   xmax += gyroX;
@@ -153,12 +150,12 @@ void epocutils::getGyroData(Local<Object> event, unsigned int userID){
   epocutils::sendGyroDataToJs(event, xmax, ymax);
 }
 
-void epocutils::sendGyroDataToJs(Local<Object> event, int xPos, int yPos){
-  Nan::Set(event, Nan::New("gyroX").ToLocalChecked(), Nan::New(xPos));
-  Nan::Set(event, Nan::New("gyroY").ToLocalChecked(), Nan::New(yPos));
+void epocutils::sendGyroDataToJs(Napi::Object event, int xPos, int yPos){
+  event.Set("gyroX", xPos);
+  event.Set("gyroY", yPos);
 }
 
-void epocutils::handleMentalCommandsEvent(Local<Object> event, epocutils::EpocHeadset_t user, EmoStateHandle eState, EmoEngineEventHandle eEvent){
+void epocutils::handleMentalCommandsEvent(Napi::Object event, epocutils::EpocHeadset_t user, EmoStateHandle eState, EmoEngineEventHandle eEvent){
   IEE_EmoEngineEventGetEmoState(eEvent, eState);
   IEE_MentalCommandAction_t actionType = IS_MentalCommandGetCurrentAction(eState);
   float actionPower = IS_MentalCommandGetCurrentActionPower(eState);
@@ -180,11 +177,11 @@ void epocutils::handleMentalCommandsEvent(Local<Object> event, epocutils::EpocHe
   user.cognitivAction = actionType;
   user.cognitivActionPower = actionPower;
 
-  Nan::Set(event, Nan::New("cognitivAction").ToLocalChecked(), Nan::New(user.cognitivAction));
-  Nan::Set(event, Nan::New("cognitivActionPower").ToLocalChecked(), Nan::New(user.cognitivActionPower));
+  event.Set("cognitivAction", user.cognitivAction);
+  event.Set("cognitivActionPower", user.cognitivActionPower);
 }
 
-void epocutils::handleFacialExpressionsEvents(EmoStateHandle eState, Local<Object> event, epocutils::EpocHeadset_t user){
+void epocutils::handleFacialExpressionsEvents(EmoStateHandle eState, Napi::Object event, epocutils::EpocHeadset_t user){
   user.isBlinking = IS_FacialExpressionIsBlink(eState);
   user.isWinkingLeft = IS_FacialExpressionIsLeftWink(eState);
   user.isWinkingRight = IS_FacialExpressionIsRightWink(eState);
@@ -214,20 +211,21 @@ void epocutils::handleFacialExpressionsEvents(EmoStateHandle eState, Local<Objec
   epocutils::sendFacialExpressionsEventsToJs(event, user);
 }
 
-void epocutils::sendFacialExpressionsEventsToJs(Local<Object> event, epocutils::EpocHeadset_t user){
-  Nan::Set(event, Nan::New("blink").ToLocalChecked(), Nan::New(user.isBlinking));
-  Nan::Set(event, Nan::New("winkingLeft").ToLocalChecked(), Nan::New(user.isWinkingLeft));
-  Nan::Set(event, Nan::New("winkingRight").ToLocalChecked(), Nan::New(user.isWinkingRight));
-  Nan::Set(event, Nan::New("lookingUp").ToLocalChecked(), Nan::New(user.isLookingUp));
-  Nan::Set(event, Nan::New("lookingDown").ToLocalChecked(), Nan::New(user.isLookingDown));
-  Nan::Set(event, Nan::New("lookingLeft").ToLocalChecked(), Nan::New(user.isLookingLeft));
-  Nan::Set(event, Nan::New("lookingRight").ToLocalChecked(), Nan::New(user.isLookingRight));
+void epocutils::sendFacialExpressionsEventsToJs(Napi::Object event, epocutils::EpocHeadset_t user){
 
-  Nan::Set(event, Nan::New("smile").ToLocalChecked(), Nan::New(user.smile));
-  Nan::Set(event, Nan::New("smirkRight").ToLocalChecked(), Nan::New(user.smirkRight));
-  Nan::Set(event, Nan::New("smirkLeft").ToLocalChecked(), Nan::New(user.smirkLeft));
-  Nan::Set(event, Nan::New("laugh").ToLocalChecked(), Nan::New(user.laugh));
-  Nan::Set(event, Nan::New("frown").ToLocalChecked(), Nan::New(user.frown));
+  event.Set("blink", user.isBlinking);
+  event.Set("winkingLeft", user.isWinkingLeft);
+  event.Set("winkingRight", user.isWinkingRight);
+  event.Set("lookingUp", user.isLookingUp);
+  event.Set("lookingDown", user.isLookingDown);
+  event.Set("lookingLeft", user.isLookingLeft);
+  event.Set("lookingRight", user.isLookingRight);
+  event.Set("smile", user.smile);
+  event.Set("smirkRight", user.smirkRight);
+  event.Set("smirkLeft", user.smirkLeft);
+  event.Set("laugh", user.laugh);
+  event.Set("frown",user.frown);
+
 }
 
 void epocutils::showCurrentActionPower(EmoStateHandle eState)
